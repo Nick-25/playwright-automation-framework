@@ -205,7 +205,7 @@ if (todoForm) {
             });
             tasks = tasks.map(candidate => (candidate.id === task.id ? body.task : candidate));
             status.textContent = `${task.title} completed.`;
-            renderTasks();
+            await loadTasks();
           } catch (error) {
             status.textContent = error.message;
           }
@@ -217,9 +217,10 @@ if (todoForm) {
       }),
     );
 
-    const visibleLabel = tasks.length === 1 ? 'task' : 'tasks';
     const totalLabel = pagination.total === 1 ? 'task' : 'tasks';
-    taskSummary.textContent = `${tasks.length} ${visibleLabel} shown of ${pagination.total} ${totalLabel}`;
+    const start = pagination.total === 0 ? 0 : (pagination.page - 1) * pagination.pageSize + 1;
+    const end = pagination.total === 0 ? 0 : start + tasks.length - 1;
+    taskSummary.textContent = `${start}-${end} of ${pagination.total} ${totalLabel}`;
     taskPageSummary.textContent = `Page ${pagination.page} of ${pagination.totalPages}`;
     previousPageButton.disabled = pagination.page <= 1;
     nextPageButton.disabled = pagination.page >= pagination.totalPages;

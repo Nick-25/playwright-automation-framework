@@ -2,7 +2,7 @@ import { createReadStream, mkdirSync } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import { dirname, extname, join, normalize } from 'node:path';
 import { createServer } from 'node:http';
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { createHmac, randomUUID, timingSafeEqual } from 'node:crypto';
 import Database from 'better-sqlite3';
 
 const port = Number(process.env.PORT ?? 3000);
@@ -683,7 +683,7 @@ const server = createServer(async (request, response) => {
       }
 
       const createdTask = {
-        id: `task-${Date.now()}`,
+        id: `task-${randomUUID()}`,
         title,
         assigneeId,
         priority,
@@ -769,3 +769,13 @@ const server = createServer(async (request, response) => {
 server.listen(port, '127.0.0.1', () => {
   console.log(`Sample app running at http://127.0.0.1:${port}`);
 });
+
+function shutdown() {
+  server.close(() => {
+    db.close();
+    process.exit(0);
+  });
+}
+
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);

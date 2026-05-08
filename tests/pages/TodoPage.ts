@@ -86,6 +86,16 @@ export class TodoPage {
     await expect(this.latestTaskRow(taskName)).toBeVisible();
   }
 
+  async expectTaskRow(task: { title: string; assignee: string; priority: string; status: string }) {
+    const row = this.latestTaskRow(task.title);
+
+    await expect(row).toBeVisible();
+    await expect(row.locator('td').nth(0)).toHaveText(task.title);
+    await expect(row.locator('td').nth(1)).toHaveText(task.assignee);
+    await expect(row.locator('td').nth(2)).toHaveText(task.priority);
+    await expect(row.locator('td').nth(3)).toHaveText(task.status);
+  }
+
   async expectTaskHidden(taskName: string) {
     await expect(this.taskRow(taskName)).toHaveCount(0);
   }

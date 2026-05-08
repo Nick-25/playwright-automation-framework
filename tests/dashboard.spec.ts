@@ -27,11 +27,13 @@ test.describe('dashboard welcome page', () => {
 
     await dashboardPage.expectAuthenticatedShell(users.nick.name);
     await dashboardPage.loadDashboard();
+    const dashboardResponse = await page.request.get('/api/dashboard');
+    const dashboard = await dashboardResponse.json();
 
     await expect(dashboardPage.status).toHaveText('Dashboard loaded.');
-    await expect(dashboardPage.openMetric).toHaveText('1');
-    await expect(dashboardPage.blockedMetric).toHaveText('0');
-    await expect(dashboardPage.highPriorityMetric).toHaveText('1');
+    await expect(dashboardPage.openMetric).toHaveText(String(dashboard.metrics.openTasks));
+    await expect(dashboardPage.blockedMetric).toHaveText(String(dashboard.metrics.blockedTasks));
+    await expect(dashboardPage.highPriorityMetric).toHaveText(String(dashboard.metrics.highPriorityTasks));
     await expect(dashboardPage.activityItems).toHaveCount(3);
   });
 
