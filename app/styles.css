@@ -1,0 +1,169 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: #17202a;
+  background: #f6f8fb;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+header {
+  background: #ffffff;
+  border-bottom: 1px solid #d8dee8;
+}
+
+.shell {
+  width: min(960px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+  gap: 16px;
+}
+
+.brand {
+  margin: 0;
+  font-size: 20px;
+}
+
+nav {
+  display: flex;
+  gap: 12px;
+}
+
+nav a {
+  color: #315f95;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+main {
+  padding: 32px 0;
+}
+
+.panel {
+  max-width: 640px;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+}
+
+h1 {
+  margin: 0 0 20px;
+  font-size: 30px;
+}
+
+form {
+  display: grid;
+  gap: 14px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-weight: 700;
+}
+
+input {
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid #a9b4c2;
+  border-radius: 6px;
+  font: inherit;
+}
+
+input[aria-invalid='true'] {
+  border-color: #b42318;
+  outline-color: #b42318;
+}
+
+button {
+  min-height: 40px;
+  width: fit-content;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 6px;
+  color: #ffffff;
+  background: #2264a8;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #174c83;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+ul {
+  display: grid;
+  gap: 10px;
+  padding-left: 0;
+  list-style: none;
+}
+
+li {
+  padding: 12px;
+  border: 1px solid #d8dee8;
+  border-radius: 6px;
+}
+
+li label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 400;
+}
+
+li input {
+  min-height: auto;
+}
+
+dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 10px 18px;
+}
+
+dt {
+  font-weight: 700;
+}
+
+[role='status'] {
+  min-height: 24px;
+  margin: 8px 0 0;
+  font-weight: 700;
+}
+
+.field-error {
+  min-height: 20px;
+  color: #b42318;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.hint {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #d8dee8;
+}
+
+.hint p {
+  margin: 0 0 10px;
+  font-weight: 700;
+}
+
+.hint ul {
+  margin: 0;
+}

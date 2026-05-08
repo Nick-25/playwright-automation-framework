@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign In</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header>
+      <div class="shell topbar">
+        <p class="brand">Playwright POM Practice App</p>
+        <nav aria-label="Primary">
+          <a href="/todos">Tasks</a>
+          <a href="/sign-in">Sign in</a>
+          <a href="/profile">Profile</a>
+        </nav>
+      </div>
+    </header>
+    <main class="shell">
+      <section class="panel">
+        <h1>Sign in</h1>
+        <form aria-label="Sign in" data-testid="sign-in-form" novalidate>
+          <label>
+            Email
+            <input name="email" type="email" autocomplete="email" required />
+            <span class="field-error" data-testid="email-error"></span>
+          </label>
+          <label>
+            Password
+            <input name="password" type="password" autocomplete="current-password" minlength="8" required />
+            <span class="field-error" data-testid="password-error"></span>
+          </label>
+          <button>Sign in</button>
+          <p role="status"></p>
+        </form>
+        <div class="hint" aria-label="Sample users">
+          <p>Sample users</p>
+          <ul data-testid="sample-users"></ul>
+        </div>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

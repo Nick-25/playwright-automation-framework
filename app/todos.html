@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Team Tasks</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header>
+      <div class="shell topbar">
+        <p class="brand">Playwright POM Practice App</p>
+        <nav aria-label="Primary">
+          <a href="/todos">Tasks</a>
+          <a href="/sign-in">Sign in</a>
+          <a href="/profile">Profile</a>
+        </nav>
+      </div>
+    </header>
+    <main class="shell">
+      <section class="panel">
+        <h1>Team Tasks</h1>
+        <form aria-label="Add a task" data-testid="todo-form">
+          <label>
+            New task
+            <input name="task" placeholder="Write a task" />
+          </label>
+          <button>Add</button>
+        </form>
+        <ul aria-label="Task list" data-testid="task-list">
+          <li>
+            <label><input type="checkbox" /> Review pull request</label>
+          </li>
+          <li>
+            <label><input type="checkbox" /> Update test plan</label>
+          </li>
+        </ul>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

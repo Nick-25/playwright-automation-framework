@@ -1,0 +1,22 @@
+{
+  "name": "playwright-pom-practice-app",
+  "version": "1.0.0",
+  "description": "A small sample app with standard Playwright Test and Page Object Model examples.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "report": "playwright show-report"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^20.19.40"
+  }
+}

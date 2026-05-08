@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Profile</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header>
+      <div class="shell topbar">
+        <p class="brand">Playwright POM Practice App</p>
+        <nav aria-label="Primary">
+          <a href="/todos">Tasks</a>
+          <a href="/sign-in">Sign in</a>
+          <a href="/profile">Profile</a>
+        </nav>
+      </div>
+    </header>
+    <main class="shell">
+      <section class="panel">
+        <h1>Profile</h1>
+        <p data-testid="profile-session">Not signed in.</p>
+        <button data-testid="load-profile">Load profile</button>
+        <p role="status"></p>
+        <dl>
+          <dt>Name</dt>
+          <dd data-testid="profile-name"></dd>
+          <dt>Email</dt>
+          <dd data-testid="profile-email"></dd>
+          <dt>Role</dt>
+          <dd data-testid="profile-role"></dd>
+          <dt>Team</dt>
+          <dd data-testid="profile-team"></dd>
+        </dl>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>
