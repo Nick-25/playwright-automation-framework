@@ -24,6 +24,10 @@ function formatDuration(milliseconds) {
   return `${(milliseconds / 1000).toFixed(1)}s`;
 }
 
+function totalDuration(tests) {
+  return tests.reduce((total, test) => total + test.duration, 0);
+}
+
 function labelStatus(status) {
   switch (status) {
     case 'expected':
@@ -39,6 +43,39 @@ function labelStatus(status) {
     default:
       return status ? String(status) : 'Unknown';
   }
+}
+
+function groupBy(items, getKey) {
+  return items.reduce((groups, item) => {
+    const key = getKey(item);
+    groups.set(key, [...(groups.get(key) ?? []), item]);
+    return groups;
+  }, new Map());
+}
+
+function statusCounts(tests) {
+  return tests.reduce(
+    (totals, test) => {
+      totals[test.status] = (totals[test.status] ?? 0) + 1;
+      return totals;
+    },
+    {},
+  );
+}
+
+function displayTitle(test) {
+  const filePrefix = `${test.file} > `;
+  return test.title.startsWith(filePrefix) ? test.title.slice(filePrefix.length) : test.title;
+}
+
+function statusSummary(tests) {
+  const counts = statusCounts(tests);
+  return [
+    `Passed ${counts.expected ?? 0}`,
+    `Failed ${counts.unexpected ?? 0}`,
+    `Flaky ${counts.flaky ?? 0}`,
+    `Skipped ${counts.skipped ?? 0}`,
+  ].join(' | ');
 }
 
 function collectTests(suite, fileName = '', titlePath = []) {
@@ -81,35 +118,58 @@ if (!existsSync(reportPath)) {
 
 const report = JSON.parse(readFileSync(reportPath, 'utf8'));
 const tests = collectTests(report.suites ?? {});
-const counts = tests.reduce(
-  (totals, test) => {
-    totals[test.status] = (totals[test.status] ?? 0) + 1;
-    return totals;
-  },
-  {},
+const counts = statusCounts(tests);
+const projects = [...groupBy(tests, test => test.project).entries()].sort(([left], [right]) =>
+  left.localeCompare(right),
 );
+const problemTests = tests.filter(test => ['unexpected', 'flaky', 'interrupted'].includes(test.status));
+const overallStatus = problemTests.length ? 'Needs attention' : 'Passed';
+
+function resultTable(testsToRender) {
+  return [
+    '| Status | Test | File | Retries | Duration |',
+    '| --- | --- | --- | ---: | ---: |',
+    ...testsToRender.map(test =>
+      [
+        escapeMarkdown(labelStatus(test.status)),
+        escapeMarkdown(displayTitle(test)),
+        escapeMarkdown(test.file),
+        String(test.retries),
+        formatDuration(test.duration),
+      ].join(' | '),
+    ).map(row => `| ${row} |`),
+  ].join('\n');
+}
 
 const summary = [
   '## Playwright Test Results',
   '',
-  `Total: ${tests.length}`,
-  `Passed: ${counts.expected ?? 0}`,
-  `Failed: ${counts.unexpected ?? 0}`,
-  `Flaky: ${counts.flaky ?? 0}`,
-  `Skipped: ${counts.skipped ?? 0}`,
+  `**Overall:** ${overallStatus}`,
   '',
-  '| Project | Status | Test | File | Retries | Duration |',
-  '| --- | --- | --- | --- | ---: | ---: |',
-  ...tests.map(test =>
-    [
-      escapeMarkdown(test.project),
-      escapeMarkdown(labelStatus(test.status)),
-      escapeMarkdown(test.title),
-      escapeMarkdown(test.file),
-      String(test.retries),
-      formatDuration(test.duration),
-    ].join(' | '),
-  ).map(row => `| ${row} |`),
+  '| Total | Passed | Failed | Flaky | Skipped | Duration |',
+  '| ---: | ---: | ---: | ---: | ---: | ---: |',
+  `| ${tests.length} | ${counts.expected ?? 0} | ${counts.unexpected ?? 0} | ${counts.flaky ?? 0} | ${counts.skipped ?? 0} | ${formatDuration(totalDuration(tests))} |`,
+  '',
+  ...(problemTests.length
+    ? [
+        '<details open>',
+        '<summary><strong>Failures, flaky tests, and interruptions</strong></summary>',
+        '',
+        resultTable(problemTests),
+        '',
+        '</details>',
+        '',
+      ]
+    : ['All tests passed without flakes.', '']),
+  ...projects.flatMap(([project, projectTests]) => [
+    '<details>',
+    `<summary><strong>${escapeMarkdown(project)}</strong> - ${escapeMarkdown(statusSummary(projectTests))} - ${formatDuration(totalDuration(projectTests))}</summary>`,
+    '',
+    resultTable(projectTests),
+    '',
+    '</details>',
+    '',
+  ]),
   '',
 ].join('\n');
 
