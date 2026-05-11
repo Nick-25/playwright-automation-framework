@@ -24,9 +24,9 @@ export class DashboardPage {
     this.headerLogin = page.getByTestId('header-login');
     this.headerLogout = page.getByTestId('header-logout');
     const primaryNav = page.getByRole('navigation', { name: 'Primary' });
-    this.homeLink = primaryNav.getByRole('link', { name: 'Home', exact: true });
-    this.tasksLink = primaryNav.getByRole('link', { name: 'Tasks', exact: true });
-    this.profileLink = primaryNav.getByRole('link', { name: 'Profile', exact: true });
+    this.homeLink = page.locator('nav[aria-label="Primary"] a.auth-only', { hasText: 'Home' });
+    this.tasksLink = page.locator('nav[aria-label="Primary"] a.auth-only', { hasText: 'Tasks' });
+    this.profileLink = page.locator('nav[aria-label="Primary"] a.auth-only', { hasText: 'Profile' });
     this.heroLogin = page.getByTestId('hero-login');
     this.dashboard = page.getByTestId('dashboard');
     this.authenticatedBanner = page.getByTestId('authenticated-banner');
@@ -70,6 +70,7 @@ export class DashboardPage {
 
   async loadDashboard() {
     await this.loadDashboardButton.click();
+    await expect(this.status).toHaveText('Dashboard loaded.');
   }
 
   async logout() {

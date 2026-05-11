@@ -11,6 +11,7 @@ export class TodoPage {
   readonly searchInput: Locator;
   readonly statusFilter: Locator;
   readonly priorityFilter: Locator;
+  readonly status: Locator;
   readonly summary: Locator;
   readonly pageSummary: Locator;
   readonly previousPageButton: Locator;
@@ -27,6 +28,7 @@ export class TodoPage {
     this.searchInput = page.getByTestId('task-search');
     this.statusFilter = page.getByTestId('status-filter');
     this.priorityFilter = page.getByTestId('priority-filter');
+    this.status = page.getByRole('status');
     this.summary = page.getByTestId('task-summary');
     this.pageSummary = page.getByTestId('task-page-summary');
     this.previousPageButton = page.getByTestId('previous-page');
@@ -35,6 +37,7 @@ export class TodoPage {
 
   async goto() {
     await this.page.goto('/todos');
+    await expect(this.summary).toContainText(/of \d+ tasks?/);
   }
 
   async expectLoaded() {
@@ -42,8 +45,17 @@ export class TodoPage {
   }
 
   async addTask(taskName: string) {
+    const title = taskName.trim();
     await this.newTaskInput.fill(taskName);
+
+    if (!title) {
+      await this.addButton.click();
+      return;
+    }
+
     await this.addButton.click();
+    await expect(this.latestTaskRow(title)).toBeVisible();
+    await expect(this.newTaskInput).toHaveValue('');
   }
 
   async addDetailedTask(task: { title: string; assignee: string; priority: string; dueDate: string }) {
@@ -52,6 +64,8 @@ export class TodoPage {
     await this.prioritySelect.selectOption(task.priority);
     await this.dueDateInput.fill(task.dueDate);
     await this.addButton.click();
+    await expect(this.latestTaskRow(task.title)).toBeVisible();
+    await expect(this.newTaskInput).toHaveValue('');
   }
 
   taskRow(taskName: string) {

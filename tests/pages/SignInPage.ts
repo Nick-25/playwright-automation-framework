@@ -21,12 +21,36 @@ export class SignInPage {
 
   async goto() {
     await this.page.goto('/sign-in');
+    await expect(this.sampleUsers).toHaveCount(3);
   }
 
   async signIn(email: string, password: string) {
     await this.emailInput.fill(email);
     await this.passwordInput.fill(password);
+
+    const canSubmit = await this.emailInput.evaluate(input => input.form?.checkValidity() ?? false);
+
+    if (!canSubmit) {
+      await this.signInButton.click();
+      await expect(this.status).toHaveText('Please fix the highlighted fields.');
+      return;
+    }
+
+    const loginResponse = this.page.waitForResponse(response => {
+      const url = new URL(response.url());
+
+      return url.pathname === '/api/login' && response.request().method() === 'POST';
+    });
+
     await this.signInButton.click();
+    const response = await loginResponse;
+
+    if (response.ok()) {
+      await expect(this.page).toHaveURL('/');
+      return;
+    }
+
+    await expect(this.status).not.toHaveText('Signing in...');
   }
 
   async expectStatus(message: string) {
