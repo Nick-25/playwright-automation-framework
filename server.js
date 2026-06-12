@@ -725,6 +725,29 @@ const server = createServer(async (request, response) => {
     return;
   }
 
+  if (url.pathname.match(/^\/api\/tasks\/[^/]+$/) && request.method === 'DELETE') {
+    const user = requireUser(request, response);
+
+    if (!user) return;
+
+    const taskId = decodeURIComponent(url.pathname.split('/')[3]);
+    const task = getTaskById(taskId);
+
+    if (!task) {
+      sendJson(response, 404, { message: 'Task not found.' });
+      return;
+    }
+
+    if (task.assigneeId !== user.id && user.access !== 'admin') {
+      sendJson(response, 403, { message: 'You can only delete tasks assigned to you.' });
+      return;
+    }
+
+    db.prepare('DELETE FROM tasks WHERE id = ?').run(task.id);
+    sendJson(response, 200, { deletedTask: publicTask(task) });
+    return;
+  }
+
   if (url.pathname === '/api/user-info') {
     const user = userFromRequest(request);
 

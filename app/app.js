@@ -210,7 +210,29 @@ if (todoForm) {
             status.textContent = error.message;
           }
         });
-        actionCell.append(completeButton);
+        const deleteButton = document.createElement('button');
+        deleteButton.type = 'button';
+        deleteButton.textContent = 'Delete';
+        deleteButton.setAttribute('aria-label', `Delete ${task.title}`);
+        deleteButton.addEventListener('click', async () => {
+          try {
+            await fetchJson(`/api/tasks/${task.id}`, {
+              method: 'DELETE',
+              headers: authHeader(),
+            });
+            tasks = tasks.filter(candidate => candidate.id !== task.id);
+            status.textContent = `${task.title} deleted.`;
+
+            if (tasks.length === 0 && pagination.page > 1) {
+              pagination.page -= 1;
+            }
+
+            await loadTasks();
+          } catch (error) {
+            status.textContent = error.message;
+          }
+        });
+        actionCell.append(completeButton, deleteButton);
 
         row.append(titleCell, assigneeCell, priorityCell, statusCell, dueCell, actionCell);
         return row;

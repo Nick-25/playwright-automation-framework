@@ -234,63 +234,76 @@ test.describe('admin user management API', () => {
 test.describe('task API', () => {
   test('adds tasks to any user but only returns the logged-in users tasks', async ({ request }) => {
     const adminAuth = await login(request, users.admin);
-    const createUserResponse = await request.post('/api/users', {
-      headers: {
-        authorization: `Bearer ${adminAuth.token}`,
-      },
-      data: {
-        email: `task-owner-${Date.now()}@example.com`,
-        password: 'task-owner-123',
-        name: 'Task Owner',
-        role: 'Analyst',
-        team: 'Reporting',
-      },
-    });
-    const createUserBody = await createUserResponse.json();
+    let createdUserId: string | undefined;
 
-    expect(createUserResponse.status()).toBe(201);
+    try {
+      const createUserResponse = await request.post('/api/users', {
+        headers: {
+          authorization: `Bearer ${adminAuth.token}`,
+        },
+        data: {
+          email: `task-owner-${Date.now()}@example.com`,
+          password: 'task-owner-123',
+          name: 'Task Owner',
+          role: 'Analyst',
+          team: 'Reporting',
+        },
+      });
+      const createUserBody = await createUserResponse.json();
 
-    const createTaskResponse = await request.post('/api/tasks', {
-      headers: {
-        authorization: `Bearer ${adminAuth.token}`,
-      },
-      data: {
+      expect(createUserResponse.status()).toBe(201);
+      createdUserId = createUserBody.user.id;
+
+      const createTaskResponse = await request.post('/api/tasks', {
+        headers: {
+          authorization: `Bearer ${adminAuth.token}`,
+        },
+        data: {
+          title: 'Validate enrollment extract',
+          assigneeId: createUserBody.user.id,
+          priority: 'High',
+          dueDate: '2026-05-22',
+        },
+      });
+      const createTaskBody = await createTaskResponse.json();
+
+      expect(createTaskResponse.status()).toBe(201);
+      expect(createTaskBody.task).toMatchObject({
         title: 'Validate enrollment extract',
-        assigneeId: createUserBody.user.id,
-        priority: 'High',
-        dueDate: '2026-05-22',
-      },
-    });
-    const createTaskBody = await createTaskResponse.json();
+        assignee: 'Task Owner',
+        status: 'Open',
+      });
 
-    expect(createTaskResponse.status()).toBe(201);
-    expect(createTaskBody.task).toMatchObject({
-      title: 'Validate enrollment extract',
-      assignee: 'Task Owner',
-      status: 'Open',
-    });
+      const adminTasksResponse = await request.get('/api/tasks', {
+        headers: {
+          authorization: `Bearer ${adminAuth.token}`,
+        },
+      });
+      const adminTasksBody = await adminTasksResponse.json();
 
-    const adminTasksResponse = await request.get('/api/tasks', {
-      headers: {
-        authorization: `Bearer ${adminAuth.token}`,
-      },
-    });
-    const adminTasksBody = await adminTasksResponse.json();
+      expect(adminTasksBody.tasks.map((task: { id: string }) => task.id)).not.toContain(createTaskBody.task.id);
 
-    expect(adminTasksBody.tasks.map((task: { id: string }) => task.id)).not.toContain(createTaskBody.task.id);
+      const ownerAuth = await login(request, {
+        ...createUserBody.user,
+        password: 'task-owner-123',
+      });
+      const ownerTasksResponse = await request.get('/api/tasks', {
+        headers: {
+          authorization: `Bearer ${ownerAuth.token}`,
+        },
+      });
+      const ownerTasksBody = await ownerTasksResponse.json();
 
-    const ownerAuth = await login(request, {
-      ...createUserBody.user,
-      password: 'task-owner-123',
-    });
-    const ownerTasksResponse = await request.get('/api/tasks', {
-      headers: {
-        authorization: `Bearer ${ownerAuth.token}`,
-      },
-    });
-    const ownerTasksBody = await ownerTasksResponse.json();
-
-    expect(ownerTasksBody.tasks.map((task: { id: string }) => task.id)).toContain(createTaskBody.task.id);
+      expect(ownerTasksBody.tasks.map((task: { id: string }) => task.id)).toContain(createTaskBody.task.id);
+    } finally {
+      if (createdUserId) {
+        await request.delete(`/api/users/${createdUserId}`, {
+          headers: {
+            authorization: `Bearer ${adminAuth.token}`,
+          },
+        });
+      }
+    }
   });
 
   test('marks the logged-in users task complete through the API', async ({ request }) => {
@@ -316,6 +329,86 @@ test.describe('task API', () => {
 
     expect(completeResponse.ok()).toBeTruthy();
     expect(completeBody.task.status).toBe('Done');
+  });
+
+  test('deletes the logged-in users task through the API', async ({ request }) => {
+    const adminAuth = await login(request, users.admin);
+    const createTaskResponse = await request.post('/api/tasks', {
+      headers: {
+        authorization: `Bearer ${adminAuth.token}`,
+      },
+      data: {
+        title: 'Delete weekly quality report',
+        assigneeId: users.admin.id,
+        priority: 'Low',
+        dueDate: '2026-05-27',
+      },
+    });
+    const createTaskBody = await createTaskResponse.json();
+    const deleteResponse = await request.delete(`/api/tasks/${createTaskBody.task.id}`, {
+      headers: {
+        authorization: `Bearer ${adminAuth.token}`,
+      },
+    });
+    const deleteBody = await deleteResponse.json();
+    const tasksResponse = await request.get('/api/tasks?q=Delete%20weekly%20quality%20report', {
+      headers: {
+        authorization: `Bearer ${adminAuth.token}`,
+      },
+    });
+    const tasksBody = await tasksResponse.json();
+
+    expect(deleteResponse.ok()).toBeTruthy();
+    expect(deleteBody.deletedTask.id).toBe(createTaskBody.task.id);
+    expect(tasksBody.tasks.map((task: { id: string }) => task.id)).not.toContain(createTaskBody.task.id);
+  });
+
+  test('blocks users from deleting tasks assigned to someone else', async ({ request }) => {
+    const adminAuth = await login(request, users.admin);
+    const adaAuth = await login(request, users.ada);
+    const createTaskResponse = await request.post('/api/tasks', {
+      headers: {
+        authorization: `Bearer ${adminAuth.token}`,
+      },
+      data: {
+        title: `Protected task ${Date.now()}`,
+        assigneeId: users.admin.id,
+        priority: 'Medium',
+        dueDate: '2026-05-28',
+      },
+    });
+    const createTaskBody = await createTaskResponse.json();
+
+    try {
+      const deleteResponse = await request.delete(`/api/tasks/${createTaskBody.task.id}`, {
+        headers: {
+          authorization: `Bearer ${adaAuth.token}`,
+        },
+      });
+      const deleteBody = await deleteResponse.json();
+
+      expect(deleteResponse.status()).toBe(403);
+      expect(deleteBody.message).toBe('You can only delete tasks assigned to you.');
+    } finally {
+      await request.delete(`/api/tasks/${createTaskBody.task.id}`, {
+        headers: {
+          authorization: `Bearer ${adminAuth.token}`,
+        },
+      });
+    }
+  });
+
+  test('returns not found when deleting an unknown task', async ({ request }) => {
+    const adminAuth = await login(request, users.admin);
+    const response = await request.delete('/api/tasks/not-a-real-task', {
+      headers: {
+        authorization: `Bearer ${adminAuth.token}`,
+      },
+    });
+    const body = await response.json();
+
+    expect(response.status()).toBe(404);
+    expect(body.message).toBe('Task not found.');
   });
 
   test('paginates task API results', async ({ request }) => {
