@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-This is a practice project. Security fixes are accepted for the current
+This is a portfolio framework. Security fixes are accepted for the current
 `master` branch.
 
 ## Reporting a Vulnerability

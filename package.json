@@ -1,7 +1,7 @@
 {
   "name": "playwright-pom-practice-app",
   "version": "1.0.0",
-  "description": "A small sample app with standard Playwright Test and Page Object Model examples.",
+  "description": "A full-stack Playwright automation framework portfolio with UI, API, CI, and reporting coverage.",
   "private": true,
   "type": "module",
   "scripts": {

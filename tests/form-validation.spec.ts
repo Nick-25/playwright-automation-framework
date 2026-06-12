@@ -2,7 +2,7 @@ import { expect, test } from './fixtures/pages.js';
 import { users } from './fixtures/users.js';
 
 test.describe('sign in', () => {
-  test('lists the real users available in the practice app', async ({ signInPage }) => {
+  test('lists the real users available in the portfolio framework', async ({ signInPage }) => {
     await signInPage.goto();
 
     await expect(signInPage.sampleUsers).toHaveText([

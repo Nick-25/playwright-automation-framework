@@ -24,7 +24,7 @@ export default defineConfig({
       {
         outputDir: 'ctrf',
         outputFile: 'ctrf-report.json',
-        appName: 'Playwright POM Practice App',
+        appName: 'Playwright Automation Framework Portfolio',
         testType: 'e2e',
       },
     ],

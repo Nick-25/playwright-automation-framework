@@ -2,7 +2,7 @@
 
 Thanks for taking a look at this project.
 
-This is a public portfolio and practice repo, so changes should go through pull
+This is a public portfolio framework repo, so changes should go through pull
 requests instead of direct pushes to `master`.
 
 ## Pull Request Expectations

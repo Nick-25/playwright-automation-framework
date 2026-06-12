@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "4fb51c7c-8a5d-4e28-9c1d-cfda4f3af001",
     "name": "Nicks Testing Portal API",
-    "description": "Import this collection into Postman to test the local Playwright POM Practice App APIs. Start the app with `npm run start` first.",
+    "description": "Import this collection into Postman to test the local Playwright Automation Framework Portfolio APIs. Start the app with `npm run start` first.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
