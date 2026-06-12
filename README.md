@@ -4,7 +4,7 @@
 [![Playwright](https://img.shields.io/badge/Playwright-1.59.1-2EAD33?logo=playwright)](https://playwright.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-20.19.0-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
-[![License](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ## Executive Summary
 
@@ -16,7 +16,7 @@ The repository includes a local full-stack application, a Playwright Test automa
 
 This project provides a controlled application under test and a full-stack Playwright automation framework around it. The app includes authentication, protected routes, dashboard metrics, profile data, task management workflows, role-based API behavior, and persistent local data.
 
-For a deeper walkthrough of the application behavior and test coverage, see [`docs/application-overview.md`](docs/application-overview.md).
+For deeper documentation, see [`docs/application-overview.md`](docs/application-overview.md) and [`docs/architecture.md`](docs/architecture.md).
 
 ## What This Demonstrates
 
@@ -69,6 +69,8 @@ flowchart LR
   Reports --> GHA[GitHub Actions Summary and Artifacts]
 ```
 
+Detailed architecture notes are available in [`docs/architecture.md`](docs/architecture.md), including the application layer, page objects, tests, fixtures, utilities, CI/CD, and reporting strategy.
+
 ## Project Structure
 
 ```text
@@ -76,6 +78,9 @@ flowchart LR
 |-- app/                         Static front end for the application under test
 |-- data/                        Local SQLite database location
 |-- docs/                        Supplemental project and application documentation
+|   |-- architecture.md          Framework architecture and maintainability notes
+|   |-- application-overview.md  Application behavior and test coverage overview
+|   `-- images/                  Real screenshot captures, when added
 |-- scripts/                     Supporting project scripts
 |-- tests/
 |   |-- fixtures/                Shared Playwright fixtures and seeded users
@@ -91,6 +96,7 @@ flowchart LR
 |-- server.js                    Local Node.js application and API server
 |-- postman_collection.json      API collection for manual API exploration
 |-- package.json                 Node scripts and dependencies
+|-- LICENSE                      MIT license
 `-- README.md                    Portfolio and framework overview
 ```
 
@@ -131,6 +137,25 @@ The framework uses multiple reporting outputs so results are useful to both engi
 - CTRF JSON provides a standardized machine-readable report format.
 - `ctrf-io/github-test-reporter` publishes pass/fail, flaky, skipped, retry, duration, and detailed test-result sections in GitHub Actions.
 - Uploaded artifacts preserve test evidence for post-run triage.
+
+## Screenshots
+
+Screenshots are intentionally listed as placeholders until real project captures are added. Do not add generated or mock screenshots; use actual captures from local execution or GitHub Actions artifacts.
+
+| Area | Placeholder path | Purpose |
+| --- | --- | --- |
+| Login page | `docs/images/login-page.png` | Show the authentication entry point and validation surface |
+| Dashboard | `docs/images/dashboard.png` | Show the authenticated workspace and metrics |
+| GitHub Actions run | `docs/images/github-actions-run.png` | Show CI execution and workflow status |
+| Playwright HTML report | `docs/images/playwright-html-report.png` | Show the local/debuggable Playwright report |
+| Test results | `docs/images/test-results.png` | Show summarized pass/fail and reporting output |
+
+## Lessons Learned
+
+- **Framework maintainability:** Page objects and fixtures keep selectors, setup, and repeated user actions out of specs, making the suite easier to extend as workflows change.
+- **Flaky test reduction:** Playwright auto-waiting, API-driven setup, stable seeded users, and targeted cleanup reduce timing sensitivity and state leakage.
+- **Reporting strategy:** Pairing Playwright HTML reports with CTRF JSON and GitHub Actions summaries gives both engineers and stakeholders useful views of the same execution.
+- **Test organization:** Splitting UI workflows, API coverage, fixtures, helpers, and page objects keeps the framework readable while still demonstrating full-stack validation.
 
 ## Local Execution
 
