@@ -84,6 +84,10 @@ export class TodoPage {
     await this.latestTaskRow(taskName).getByRole('button', { name: `Mark ${taskName} complete` }).click();
   }
 
+  async deleteTask(taskName: string) {
+    await this.latestTaskRow(taskName).getByRole('button', { name: `Delete ${taskName}` }).click();
+  }
+
   async searchFor(text: string) {
     await this.searchInput.fill(text);
   }

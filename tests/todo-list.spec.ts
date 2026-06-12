@@ -43,6 +43,22 @@ test.describe('todo list', () => {
     await expect(todoPage.latestTaskRow(taskName).locator('td').nth(3)).toHaveText('Done');
   });
 
+  test('deletes a task from the task table', async ({ todoPage }) => {
+    await todoPage.goto();
+    const taskName = `Task to delete ${Date.now()}`;
+
+    await todoPage.addTask(taskName);
+    await todoPage.searchFor(taskName);
+    await todoPage.expectTaskVisible(taskName);
+    await expect(todoPage.summary).toHaveText(/1-1 of 1 task/);
+
+    await todoPage.deleteTask(taskName);
+
+    await todoPage.expectTaskHidden(taskName);
+    await expect(todoPage.summary).toHaveText(/0-0 of 0 tasks/);
+    await expect(todoPage.status).toHaveText(`${taskName} deleted.`);
+  });
+
   test('removes a completed task from the open task table', async ({ todoPage }) => {
     await todoPage.goto();
     const taskName = `Complete and remove ${Date.now()}`;
