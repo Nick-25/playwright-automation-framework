@@ -30,6 +30,7 @@ Test specifications live directly under `tests/`.
 - Browser tests validate end-to-end workflows through real pages.
 - API tests validate authentication, authorization, user management, task workflows, pagination, and negative paths.
 - Accessibility smoke tests use `@axe-core/playwright` to scan public and authenticated pages for WCAG A/AA violations.
+- Visual regression smoke tests use Playwright screenshot assertions for stable Chromium baselines.
 - Tests are organized around behavior areas rather than implementation files.
 - Cross-browser projects run the same suite in Chromium and Firefox.
 
@@ -49,6 +50,7 @@ Fixtures keep test setup predictable and make specs easier to scan.
 Reusable helpers live in `tests/helpers/`.
 
 - Authentication helpers can establish a stored session without repeating UI login in every test.
+- API helpers centralize login and cleanup for users/tasks created during test execution.
 - Shared helpers reduce repeated setup code while keeping test intent visible.
 
 The framework uses utilities sparingly so the suite remains explicit and easy for new maintainers to understand.
@@ -62,6 +64,8 @@ The GitHub Actions workflow in `.github/workflows/playwright.yml` is split into 
 - The report job downloads artifacts and publishes a CTRF summary into GitHub Actions.
 
 The CI design is meant to support fast feedback, consistent artifacts, and clear failure triage.
+
+Docker support provides an additional path for consistent local or CI-like execution with Playwright's official browser image.
 
 ## Reporting
 

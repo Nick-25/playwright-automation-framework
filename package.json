@@ -1,5 +1,5 @@
 {
-  "name": "playwright-pom-practice-app",
+  "name": "playwright-automation-framework",
   "version": "1.0.0",
   "description": "A full-stack Playwright automation framework portfolio with UI, API, CI, and reporting coverage.",
   "private": true,
@@ -8,6 +8,7 @@
     "start": "node server.js",
     "test": "playwright test",
     "test:a11y": "playwright test tests/accessibility.spec.ts",
+    "test:visual": "playwright test tests/visual-regression.spec.ts --project=chromium",
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
     "test:debug": "playwright test --debug",
@@ -16,11 +17,15 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
     "@playwright/test": "^1.59.1",
     "@types/node": "^25.9.2",
-    "playwright-ctrf-json-reporter": "^0.0.29"
+    "playwright-ctrf-json-reporter": "^0.0.29",
+    "typescript": "^6.0.3"
   },
   "dependencies": {
     "better-sqlite3": "^12.10.0"

@@ -1,4 +1,4 @@
-import AxeBuilder from '@axe-core/playwright';
+import { AxeBuilder } from '@axe-core/playwright';
 import { type Page } from '@playwright/test';
 import { expect, test } from './fixtures/pages.js';
 import { signInWithStoredSession } from './helpers/auth.js';

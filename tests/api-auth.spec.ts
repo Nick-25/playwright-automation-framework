@@ -1,21 +1,10 @@
-import { expect, test, type APIRequestContext } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { users } from './fixtures/users.js';
+import { deleteTaskIfPresent, deleteUserIfPresent, login } from './helpers/api.js';
 
 type PublicUser = {
   email: string;
 };
-
-async function login(request: APIRequestContext, user: (typeof users)[keyof typeof users]) {
-  const response = await request.post('/api/login', {
-    data: {
-      email: user.email,
-      password: user.password,
-    },
-  });
-
-  expect(response.ok()).toBeTruthy();
-  return response.json();
-}
 
 test.describe('JWT API access', () => {
   test('creates a 4 hour JWT session cookie at login', async ({ request }) => {
@@ -135,46 +124,53 @@ test.describe('JWT API access', () => {
 test.describe('admin user management API', () => {
   test('allows an admin to add and delete a user', async ({ request }) => {
     const adminAuth = await login(request, users.admin);
-    const createResponse = await request.post('/api/users', {
-      headers: {
-        authorization: `Bearer ${adminAuth.token}`,
-      },
-      data: {
-        email: 'pat@example.com',
-        password: 'pat-12345',
+    let createdUserId: string | undefined;
+
+    try {
+      const createResponse = await request.post('/api/users', {
+        headers: {
+          authorization: `Bearer ${adminAuth.token}`,
+        },
+        data: {
+          email: `pat-${Date.now()}@example.com`,
+          password: 'pat-12345',
+          name: 'Pat Analyst',
+          role: 'Data Analyst',
+          team: 'Reporting',
+          access: 'user',
+        },
+      });
+      const createBody = await createResponse.json();
+      createdUserId = createBody.user.id;
+
+      expect(createResponse.status()).toBe(201);
+      expect(createBody.user).toMatchObject({
         name: 'Pat Analyst',
-        role: 'Data Analyst',
-        team: 'Reporting',
         access: 'user',
-      },
-    });
-    const createBody = await createResponse.json();
+      });
 
-    expect(createResponse.status()).toBe(201);
-    expect(createBody.user).toMatchObject({
-      email: 'pat@example.com',
-      name: 'Pat Analyst',
-      access: 'user',
-    });
+      const userInfoResponse = await request.get('/api/user-info', {
+        headers: {
+          authorization: `Bearer ${adminAuth.token}`,
+        },
+      });
+      const userInfoBody = await userInfoResponse.json();
 
-    const userInfoResponse = await request.get('/api/user-info', {
-      headers: {
-        authorization: `Bearer ${adminAuth.token}`,
-      },
-    });
-    const userInfoBody = await userInfoResponse.json();
+      expect(userInfoBody.users.map((user: PublicUser) => user.email)).toContain(createBody.user.email);
 
-    expect(userInfoBody.users.map((user: PublicUser) => user.email)).toContain('pat@example.com');
+      const deleteResponse = await request.delete(`/api/users/${createBody.user.id}`, {
+        headers: {
+          authorization: `Bearer ${adminAuth.token}`,
+        },
+      });
+      const deleteBody = await deleteResponse.json();
+      createdUserId = undefined;
 
-    const deleteResponse = await request.delete(`/api/users/${createBody.user.id}`, {
-      headers: {
-        authorization: `Bearer ${adminAuth.token}`,
-      },
-    });
-    const deleteBody = await deleteResponse.json();
-
-    expect(deleteResponse.ok()).toBeTruthy();
-    expect(deleteBody.deletedUser.email).toBe('pat@example.com');
+      expect(deleteResponse.ok()).toBeTruthy();
+      expect(deleteBody.deletedUser.email).toBe(createBody.user.email);
+    } finally {
+      await deleteUserIfPresent(request, adminAuth.token, createdUserId);
+    }
   });
 
   test('blocks regular users from adding users', async ({ request }) => {
@@ -215,6 +211,23 @@ test.describe('admin user management API', () => {
 
     expect(response.status()).toBe(409);
     expect(body.message).toBe('A user with this email already exists.');
+  });
+
+  test('validates required user creation fields', async ({ request }) => {
+    const adminAuth = await login(request, users.admin);
+    const response = await request.post('/api/users', {
+      headers: {
+        authorization: `Bearer ${adminAuth.token}`,
+      },
+      data: {
+        email: `missing-fields-${Date.now()}@example.com`,
+        password: 'missing-123',
+      },
+    });
+    const body = await response.json();
+
+    expect(response.status()).toBe(400);
+    expect(body.message).toBe('Email, password, name, role, and team are required.');
   });
 
   test('returns not found when deleting an unknown user', async ({ request }) => {
@@ -297,38 +310,41 @@ test.describe('task API', () => {
       expect(ownerTasksBody.tasks.map((task: { id: string }) => task.id)).toContain(createTaskBody.task.id);
     } finally {
       if (createdUserId) {
-        await request.delete(`/api/users/${createdUserId}`, {
-          headers: {
-            authorization: `Bearer ${adminAuth.token}`,
-          },
-        });
+        await deleteUserIfPresent(request, adminAuth.token, createdUserId);
       }
     }
   });
 
   test('marks the logged-in users task complete through the API', async ({ request }) => {
     const adminAuth = await login(request, users.admin);
-    const createTaskResponse = await request.post('/api/tasks', {
-      headers: {
-        authorization: `Bearer ${adminAuth.token}`,
-      },
-      data: {
-        title: 'Publish weekly quality report',
-        assigneeId: users.admin.id,
-        priority: 'Medium',
-        dueDate: '2026-05-25',
-      },
-    });
-    const createTaskBody = await createTaskResponse.json();
-    const completeResponse = await request.patch(`/api/tasks/${createTaskBody.task.id}/complete`, {
-      headers: {
-        authorization: `Bearer ${adminAuth.token}`,
-      },
-    });
-    const completeBody = await completeResponse.json();
+    let createdTaskId: string | undefined;
 
-    expect(completeResponse.ok()).toBeTruthy();
-    expect(completeBody.task.status).toBe('Done');
+    try {
+      const createTaskResponse = await request.post('/api/tasks', {
+        headers: {
+          authorization: `Bearer ${adminAuth.token}`,
+        },
+        data: {
+          title: 'Publish weekly quality report',
+          assigneeId: users.admin.id,
+          priority: 'Medium',
+          dueDate: '2026-05-25',
+        },
+      });
+      const createTaskBody = await createTaskResponse.json();
+      createdTaskId = createTaskBody.task.id;
+      const completeResponse = await request.patch(`/api/tasks/${createTaskBody.task.id}/complete`, {
+        headers: {
+          authorization: `Bearer ${adminAuth.token}`,
+        },
+      });
+      const completeBody = await completeResponse.json();
+
+      expect(completeResponse.ok()).toBeTruthy();
+      expect(completeBody.task.status).toBe('Done');
+    } finally {
+      await deleteTaskIfPresent(request, adminAuth.token, createdTaskId);
+    }
   });
 
   test('deletes the logged-in users task through the API', async ({ request }) => {
@@ -390,11 +406,7 @@ test.describe('task API', () => {
       expect(deleteResponse.status()).toBe(403);
       expect(deleteBody.message).toBe('You can only delete tasks assigned to you.');
     } finally {
-      await request.delete(`/api/tasks/${createTaskBody.task.id}`, {
-        headers: {
-          authorization: `Bearer ${adminAuth.token}`,
-        },
-      });
+      await deleteTaskIfPresent(request, adminAuth.token, createTaskBody.task.id);
     }
   });
 
@@ -411,42 +423,83 @@ test.describe('task API', () => {
     expect(body.message).toBe('Task not found.');
   });
 
+  test('validates required task creation fields', async ({ request }) => {
+    const adminAuth = await login(request, users.admin);
+    const response = await request.post('/api/tasks', {
+      headers: {
+        authorization: `Bearer ${adminAuth.token}`,
+      },
+      data: {
+        priority: 'High',
+      },
+    });
+    const body = await response.json();
+
+    expect(response.status()).toBe(400);
+    expect(body.message).toBe('Title and assigneeId are required.');
+  });
+
+  test('rejects task creation for an unknown assignee', async ({ request }) => {
+    const adminAuth = await login(request, users.admin);
+    const response = await request.post('/api/tasks', {
+      headers: {
+        authorization: `Bearer ${adminAuth.token}`,
+      },
+      data: {
+        title: 'Cannot assign this task',
+        assigneeId: 'missing-user',
+        priority: 'Medium',
+      },
+    });
+    const body = await response.json();
+
+    expect(response.status()).toBe(404);
+    expect(body.message).toBe('Assignee not found.');
+  });
+
   test('paginates task API results', async ({ request }) => {
     const adminAuth = await login(request, users.admin);
+    const createdTaskIds: string[] = [];
 
-    for (let index = 0; index < 12; index += 1) {
-      await request.post('/api/tasks', {
+    try {
+      for (let index = 0; index < 12; index += 1) {
+        const createResponse = await request.post('/api/tasks', {
+          headers: {
+            authorization: `Bearer ${adminAuth.token}`,
+          },
+          data: {
+            title: `API paginated task ${Date.now()} ${index}`,
+            assigneeId: users.admin.id,
+            priority: 'Low',
+            dueDate: '2026-05-30',
+          },
+        });
+        const createBody = await createResponse.json();
+        createdTaskIds.push(createBody.task.id);
+      }
+
+      const firstPageResponse = await request.get('/api/tasks?page=1&pageSize=10', {
         headers: {
           authorization: `Bearer ${adminAuth.token}`,
         },
-        data: {
-          title: `API paginated task ${Date.now()} ${index}`,
-          assigneeId: users.admin.id,
-          priority: 'Low',
-          dueDate: '2026-05-30',
+      });
+      const firstPageBody = await firstPageResponse.json();
+      const secondPageResponse = await request.get('/api/tasks?page=2&pageSize=10', {
+        headers: {
+          authorization: `Bearer ${adminAuth.token}`,
         },
       });
+      const secondPageBody = await secondPageResponse.json();
+
+      expect(firstPageResponse.ok()).toBeTruthy();
+      expect(firstPageBody.tasks).toHaveLength(10);
+      expect(firstPageBody.total).toBeGreaterThanOrEqual(12);
+      expect(firstPageBody.totalPages).toBeGreaterThanOrEqual(2);
+      expect(secondPageResponse.ok()).toBeTruthy();
+      expect(secondPageBody.page).toBe(2);
+      expect(secondPageBody.tasks.length).toBeGreaterThan(0);
+    } finally {
+      await Promise.all(createdTaskIds.map(taskId => deleteTaskIfPresent(request, adminAuth.token, taskId)));
     }
-
-    const firstPageResponse = await request.get('/api/tasks?page=1&pageSize=10', {
-      headers: {
-        authorization: `Bearer ${adminAuth.token}`,
-      },
-    });
-    const firstPageBody = await firstPageResponse.json();
-    const secondPageResponse = await request.get('/api/tasks?page=2&pageSize=10', {
-      headers: {
-        authorization: `Bearer ${adminAuth.token}`,
-      },
-    });
-    const secondPageBody = await secondPageResponse.json();
-
-    expect(firstPageResponse.ok()).toBeTruthy();
-    expect(firstPageBody.tasks).toHaveLength(10);
-    expect(firstPageBody.total).toBeGreaterThanOrEqual(12);
-    expect(firstPageBody.totalPages).toBeGreaterThanOrEqual(2);
-    expect(secondPageResponse.ok()).toBeTruthy();
-    expect(secondPageBody.page).toBe(2);
-    expect(secondPageBody.tasks.length).toBeGreaterThan(0);
   });
 });
