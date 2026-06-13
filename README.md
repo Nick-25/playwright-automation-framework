@@ -10,12 +10,12 @@
 
 Playwright Automation Framework Portfolio is a production-style framework that demonstrates how modern QA automation can be designed, executed, reported, and maintained across UI and API layers.
 
-The repository includes a local full-stack application, a Playwright Test automation suite, Page Object Model abstractions, API coverage, SQLite-backed state, GitHub Actions CI, Playwright HTML artifacts, and CTRF reporting. It is structured to show senior-level automation practices rather than isolated test snippets.
+It pairs a realistic local application with layered Playwright coverage, CI reporting, and maintainable test architecture. It is structured to show senior-level automation practices rather than isolated test snippets.
 
 ## Key Capabilities
 
 - UI and API automation coverage across browser workflows, authentication, authorization, task management, user management, pagination, and negative paths
-- 48 declared Playwright test cases across 2 configured desktop browser projects, producing 96 listed project/test combinations
+- 48 Playwright test cases executed across Chromium and Firefox browser projects
 - Chromium and Firefox browser execution through Playwright projects
 - Accessibility smoke testing with `@axe-core/playwright`
 - Visual regression smoke testing with Chromium screenshot baselines
@@ -59,41 +59,36 @@ For deeper documentation, see [`docs/application-overview.md`](docs/application-
 
 ## What This Demonstrates
 
-- Playwright Test architecture for browser and API automation
+- Layered browser and API automation with Playwright Test
 - Page Object Model design for maintainable UI workflows
-- Authentication coverage across cookies, JWTs, and local browser state
-- Role-based authorization validation for user and admin flows
-- API automation for login, user management, tasks, pagination, and negative paths
-- Accessibility smoke testing with `@axe-core/playwright`
-- Visual regression smoke testing with Playwright screenshots
-- Cross-browser execution with Chromium and Firefox projects
-- Playwright `webServer` orchestration for reliable local test startup
-- SQLite-backed data persistence and seeded records
-- CI execution through GitHub Actions
-- Standardized reporting with Playwright HTML output and CTRF JSON
-- Repository hygiene through CODEOWNERS, PR templates, Dependabot, and scoped workflow permissions
+- Authentication and authorization coverage across cookies, JWTs, local browser state, user roles, and admin-only behavior
+- Workflow coverage for login, dashboard metrics, profiles, task management, pagination, validation, and negative paths
+- Accessibility and visual smoke testing with `@axe-core/playwright` and Playwright screenshot assertions
+- Cross-browser execution with Chromium and Firefox plus Playwright `webServer` orchestration
+- SQLite-backed local data with seeded records and durable cleanup helpers
+- GitHub Actions CI with Playwright HTML reports, CTRF JSON, artifacts, and scoped workflow permissions
+- Repository hygiene through CODEOWNERS, PR templates, Dependabot, and contribution/security guidance
 
 ## Business Value
 
 This framework shows how an automation solution can reduce release risk, improve regression confidence, and create actionable feedback for engineering teams.
 
-- Validates critical user journeys at the browser layer
-- Exercises service behavior directly through API tests
+- Validates critical user journeys and service behavior across UI and API layers
 - Catches authorization and data-scope defects earlier in the delivery cycle
-- Produces CI artifacts that support fast triage
-- Uses maintainable abstractions so test growth does not create unnecessary maintenance cost
-- Demonstrates how local application state can support repeatable automated validation
+- Produces CI artifacts and reports that support fast triage
+- Uses maintainable abstractions so coverage can grow without unnecessary maintenance cost
+- Supports repeatable automated validation with controlled local application state
 
 ## Consulting Relevance
 
-The project is representative of work commonly needed in QA automation consulting and modernization programs.
+The project maps to common QA automation consulting and modernization needs.
 
-- **Selenium to Playwright migrations:** Demonstrates how legacy browser automation patterns can be modernized with Playwright fixtures, auto-waiting, parallel execution, trace capture, and multi-browser projects.
-- **Playwright implementation:** Shows a practical framework baseline with page objects, shared fixtures, API helpers, test data patterns, and local app orchestration.
-- **CI/CD integration:** Includes a GitHub Actions workflow that installs dependencies, runs tests, uploads artifacts, and publishes machine-readable test results.
-- **API automation:** Covers authentication, authorization, user management, task workflows, pagination, validation, and negative-path scenarios through direct API requests.
-- **Accessibility testing:** Includes UI validation patterns, `aria-invalid` assertions, and an axe-powered smoke suite for core public and authenticated pages.
-- **Framework modernization:** Provides a compact example of replacing brittle, UI-only regression coverage with a layered automation strategy spanning UI, API, reporting, and CI.
+- **Selenium to Playwright migrations:** Shows fixtures, auto-waiting, traces, parallel execution, and multi-browser projects as a modernization path.
+- **Playwright implementation:** Provides a reusable baseline with page objects, fixtures, API helpers, test data patterns, and local app orchestration.
+- **CI/CD integration:** Runs build, test, artifact upload, and report publishing through GitHub Actions.
+- **API automation:** Validates authentication, authorization, user management, task workflows, pagination, validation, and negative paths.
+- **Accessibility testing:** Adds axe-powered smoke coverage and UI validation checks for public and authenticated pages.
+- **Framework modernization:** Demonstrates a layered strategy across UI, API, accessibility, visual checks, reporting, and CI.
 
 ## Architecture Diagram
 
