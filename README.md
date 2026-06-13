@@ -12,11 +12,50 @@ Playwright Automation Framework Portfolio is a production-style framework that d
 
 The repository includes a local full-stack application, a Playwright Test automation suite, Page Object Model abstractions, API coverage, SQLite-backed state, GitHub Actions CI, Playwright HTML artifacts, and CTRF reporting. It is structured to show senior-level automation practices rather than isolated test snippets.
 
+## Key Capabilities
+
+- UI and API automation coverage across browser workflows, authentication, authorization, task management, user management, pagination, and negative paths
+- 48 declared Playwright test cases across 2 configured desktop browser projects, producing 96 listed project/test combinations
+- Chromium and Firefox browser execution through Playwright projects
+- Accessibility smoke testing with `@axe-core/playwright`
+- Visual regression smoke testing with Chromium screenshot baselines
+- GitHub Actions CI/CD integration with build, test, artifact upload, and report publishing jobs
+- Playwright HTML and CTRF JSON reporting
+- Docker and Docker Compose execution support
+- Local application under test with Node.js, static front end, JWT sessions, protected routes, and SQLite persistence
+- Maintainable test architecture using Page Object Model classes, fixtures, and shared API/auth helpers
+
+## Screenshots
+
+These are real captures from the framework, grouped to show the app experience, CI execution, and generated test evidence.
+
+| Application | Automation Evidence |
+| --- | --- |
+| <img src="docs/images/login-page.png" alt="Login page" width="420"><br>**Login Page** | <img src="docs/images/github-actions-run.png" alt="GitHub Actions run" width="420"><br>**GitHub Actions Run** |
+| <img src="docs/images/dashboard.png" alt="Dashboard" width="420"><br>**Dashboard** | <img src="docs/images/playwright-html-report.png" alt="Playwright HTML report" width="420"><br>**Playwright HTML Report** |
+|  | <img src="docs/images/accessibility-test.png" alt="Accessibility test" width="420"><br>**Accessibility Test** |
+
+## Why This Project Exists
+
+This project exists to demonstrate production-style Playwright architecture in a compact, reviewable portfolio codebase.
+
+- Showcase UI, API, accessibility, visual, and CI testing in one coherent framework
+- Provide a realistic automation portfolio project with a live local application under test
+- Demonstrate maintainable automation patterns such as page objects, fixtures, API helpers, seeded data, and durable cleanup
+- Model how an automation framework can create useful feedback for engineers, hiring managers, and consulting clients
+
+## How to Review This Project
+
+- **Recruiters:** Start with Key Capabilities, Screenshots, and Business Value for a quick view of the portfolio scope.
+- **Hiring managers:** Review What This Demonstrates, Consulting Relevance, Architecture Diagram, and Lessons Learned to evaluate test strategy and maintainability.
+- **Engineers:** Inspect `tests/`, `playwright.config.ts`, `server.js`, and the docs links for implementation depth.
+- **Consulting clients:** Focus on CI/CD and Reporting, Docker Execution, and the reference docs to see how the framework supports repeatable delivery workflows.
+
 ## Overview
 
 This project provides a controlled application under test and a full-stack Playwright automation framework around it. The app includes authentication, protected routes, dashboard metrics, profile data, task management workflows, role-based API behavior, and persistent local data.
 
-For deeper documentation, see [`docs/application-overview.md`](docs/application-overview.md) and [`docs/architecture.md`](docs/architecture.md).
+For deeper documentation, see [`docs/application-overview.md`](docs/application-overview.md), [`docs/architecture.md`](docs/architecture.md), [`docs/local-data.md`](docs/local-data.md), [`docs/api-reference.md`](docs/api-reference.md), and [`docs/postman-usage.md`](docs/postman-usage.md).
 
 ## What This Demonstrates
 
@@ -80,9 +119,12 @@ Detailed architecture notes are available in [`docs/architecture.md`](docs/archi
 |-- app/                         Static front end for the application under test
 |-- data/                        Local SQLite database location
 |-- docs/                        Supplemental project and application documentation
-|   |-- architecture.md          Framework architecture and maintainability notes
+|   |-- api-reference.md         API endpoints and authentication details
 |   |-- application-overview.md  Application behavior and test coverage overview
-|   `-- images/                  Real screenshot captures, when added
+|   |-- architecture.md          Framework architecture and maintainability notes
+|   |-- local-data.md            SQLite persistence, seeded data, and cleanup notes
+|   |-- postman-usage.md         Manual API exploration with Postman
+|   `-- images/                  Real screenshot captures
 |-- scripts/                     Supporting project scripts
 |-- tests/
 |   |-- fixtures/                Shared Playwright fixtures and seeded users
@@ -119,60 +161,20 @@ Detailed architecture notes are available in [`docs/architecture.md`](docs/archi
 | CI/CD | GitHub Actions |
 | API exploration | Postman collection |
 
-## CI/CD Overview
+## CI/CD and Reporting
 
 The GitHub Actions workflow runs on pushes and pull requests to `master`.
 
 1. `Build App` installs dependencies and runs `npm run build --if-present`.
-2. `Run Playwright Tests` installs Playwright browsers and executes `npm test`.
+2. `Run Playwright Tests` installs Playwright browsers, executes `npm test`, and uploads artifacts.
 3. `Publish Test Report` downloads the CTRF artifact and publishes the test report into the GitHub Actions summary.
 
-The CI pipeline produces:
+The framework produces multiple reporting outputs:
 
-- `playwright-report/` for the Playwright HTML report
-- `test-results/` for traces, screenshots, videos, and attachments when generated
-- `ctrf/ctrf-report.json` for standardized test reporting
-
-## Reporting Overview
-
-The framework uses multiple reporting outputs so results are useful to both engineers and delivery stakeholders.
-
-- Playwright HTML report supports local investigation, trace review, and test-level debugging.
-- CTRF JSON provides a standardized machine-readable report format.
-- `ctrf-io/github-test-reporter` publishes pass/fail, flaky, skipped, retry, duration, and detailed test-result sections in GitHub Actions.
-- Uploaded artifacts preserve test evidence for post-run triage.
-
-## Screenshots
-
-Screenshots should be real project captures only. The images below are the current files in `docs/images`.
-
-| Area | Image |
-| --- | --- |
-| Login page | `docs/images/login-page.png` |
-| Dashboard | `docs/images/dashboard.png` |
-| GitHub Actions run | `docs/images/github-actions-run.png` |
-| Playwright HTML report | `docs/images/playwright-html-report.png` |
-| Accessibility test | `docs/images/accessibility-test.png` |
-
-### Login Page
-
-![Login page](docs/images/login-page.png)
-
-### Dashboard
-
-![Dashboard](docs/images/dashboard.png)
-
-### GitHub Actions Run
-
-![GitHub Actions run](docs/images/github-actions-run.png)
-
-### Playwright HTML Report
-
-![Playwright HTML report](docs/images/playwright-html-report.png)
-
-### Accessibility Test
-
-![Accessibility test](docs/images/accessibility-test.png)
+- Playwright HTML report for local investigation, trace review, and test-level debugging
+- `test-results/` artifacts for traces, screenshots, videos, and attachments when generated
+- `ctrf/ctrf-report.json` for standardized machine-readable reporting
+- GitHub Actions summary output through `ctrf-io/github-test-reporter`
 
 ## Lessons Learned
 
@@ -207,25 +209,14 @@ npm run report
 
 Use Node.js `20.19.0` or newer. The repository includes `.nvmrc`, and `package.json` declares the same runtime expectation through `engines`.
 
-The accessibility smoke suite lives in `tests/accessibility.spec.ts` and can be run independently with:
+## Execution and Reference Docs
 
-```powershell
-npm run test:a11y
-```
+Detailed operational documentation lives under `docs/` so this README can stay focused on the framework story.
 
-It scans public entry points and an authenticated task workflow with WCAG 2.0/2.1 A and AA axe rules. The same spec is included in the full `npm test` run.
-
-The visual regression smoke suite lives in `tests/visual-regression.spec.ts` and can be run with:
-
-```powershell
-npm run test:visual
-```
-
-Update visual baselines intentionally with:
-
-```powershell
-npx playwright test tests/visual-regression.spec.ts --project=chromium --update-snapshots
-```
+- [`docs/local-data.md`](docs/local-data.md) explains SQLite persistence, seeded users, seeded tasks, and cleanup behavior.
+- [`docs/api-reference.md`](docs/api-reference.md) documents authentication, session behavior, authorization rules, and core API endpoints.
+- [`docs/postman-usage.md`](docs/postman-usage.md) explains how to use `postman_collection.json` and local development tokens.
+- [`tests/README.md`](tests/README.md) lists test-focused commands and suite notes.
 
 ## Docker Execution
 
@@ -243,88 +234,6 @@ docker compose up --build
 ```
 
 The compose file mounts `playwright-report/`, `test-results/`, and `ctrf/` so reports are available on the host after container execution.
-
-## Local Data
-
-Users and tasks are stored in a local SQLite database at `data/app.db`. The database is created and seeded automatically when the server starts.
-
-The database file is ignored by Git, so API-created users and tasks persist on your machine across server restarts but are not pushed to GitHub.
-
-To reset local data, stop the server and delete `data/app.db`. The next server start recreates the database with seeded users and tasks.
-
-API tests use shared cleanup helpers in `tests/helpers/api.ts` to remove durable users and tasks created during a run. This keeps local SQLite state from accumulating records across repeated executions.
-
-## API and Postman Flow
-
-The repository includes `postman_collection.json` for manual API exploration against the local server.
-
-### Seeded Users
-
-| Email | Password | Access |
-| --- | --- | --- |
-| `nick@example.com` | `nick-123` | user |
-| `ada@example.com` | `lovelace-123` | user |
-| `grace@example.com` | `hopper-123` | user |
-| `admin@example.com` | `admin-123` | admin |
-
-### Authentication
-
-Log in first. The response includes a JWT token and the browser receives a 4-hour `session_token` cookie.
-
-```http
-POST http://127.0.0.1:3000/api/login
-Content-Type: application/json
-
-{
-  "email": "admin@example.com",
-  "password": "admin-123"
-}
-```
-
-Use the returned token for protected API calls:
-
-```http
-Authorization: Bearer YOUR_TOKEN_HERE
-```
-
-For Postman convenience, you can mint a token with a local signing key instead of logging in through the UI. The default local key is `local-postman-key`.
-
-```http
-POST http://127.0.0.1:3000/api/dev-token
-x-signing-key: local-postman-key
-Content-Type: application/json
-
-{
-  "email": "admin@example.com",
-  "expiresInHours": 48
-}
-```
-
-`expiresInHours` is optional. Dev tokens default to 24 hours and are capped at 7 days. For local Postman testing, use `"expiresInHours": "never"` to create a non-expiring token.
-
-Tokens remain valid after server restarts as long as `JWT_SECRET` stays the same and the token has not expired. Non-expiring dev tokens remain valid until you change `JWT_SECRET` or delete the user. The default local JWT secret is stable for this portfolio framework, but you can set your own:
-
-```powershell
-$env:JWT_SECRET="your-local-jwt-secret"
-npm run start
-```
-
-### Core API Endpoints
-
-| Endpoint | Purpose |
-| --- | --- |
-| `POST /api/login` | Authenticate and issue a JWT |
-| `POST /api/logout` | Clear the browser session cookie |
-| `GET /api/session` | Restore the current session |
-| `GET /api/profile` | Return the signed-in user's profile |
-| `GET /api/dashboard` | Return dashboard metrics |
-| `GET /api/user-info` | Return scoped user data |
-| `POST /api/users` | Create a user, admin token required |
-| `DELETE /api/users/:id` | Delete a user, admin token required |
-| `GET /api/tasks` | Return assigned tasks with filters and pagination |
-| `POST /api/tasks` | Create a task |
-| `PATCH /api/tasks/:id/complete` | Mark an authorized task complete |
-| `DELETE /api/tasks/:id` | Delete an authorized task |
 
 ## Repository Protection
 
@@ -347,5 +256,3 @@ For full protection, enable a GitHub branch protection rule or ruleset for `mast
 - Introduce test data factories for larger API and UI scenarios
 - Add contract-style validation for API response schemas
 - Publish test trend data across CI runs
-
-
