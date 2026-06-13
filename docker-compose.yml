@@ -1,0 +1,8 @@
+services:
+  playwright-framework:
+    build: .
+    command: npm test
+    volumes:
+      - ./playwright-report:/app/playwright-report
+      - ./test-results:/app/test-results
+      - ./ctrf:/app/ctrf

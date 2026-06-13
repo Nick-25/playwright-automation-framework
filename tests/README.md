@@ -8,6 +8,7 @@ Common commands:
 
 - `npm test` runs all tests headlessly.
 - `npm run test:a11y` runs the axe accessibility smoke tests.
+- `npm run test:visual` runs the Chromium visual regression smoke tests.
 - `npm run test:headed` opens real browser windows while tests run.
 - `npm run test:ui` launches Playwright's interactive UI mode.
 - `npm run test:debug` opens the debugger for step-by-step inspection.
@@ -19,3 +20,6 @@ describe user behavior, while page objects own locators and common actions.
 
 Accessibility smoke coverage lives in `tests/accessibility.spec.ts` and uses
 `@axe-core/playwright` against public and authenticated pages.
+
+Visual regression smoke coverage lives in `tests/visual-regression.spec.ts`.
+Update baselines only for intentional UI changes.

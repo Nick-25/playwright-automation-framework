@@ -28,7 +28,7 @@ export class SignInPage {
     await this.emailInput.fill(email);
     await this.passwordInput.fill(password);
 
-    const canSubmit = await this.emailInput.evaluate(input => input.form?.checkValidity() ?? false);
+    const canSubmit = await this.emailInput.evaluate(input => (input as HTMLInputElement).form?.checkValidity() ?? false);
 
     if (!canSubmit) {
       await this.signInButton.click();

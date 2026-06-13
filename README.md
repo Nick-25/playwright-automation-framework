@@ -1,6 +1,6 @@
 # Playwright Automation Framework Portfolio
 
-[![GitHub Actions](https://github.com/Nick-25/Playwright_POM_Practice_App/actions/workflows/playwright.yml/badge.svg)](https://github.com/Nick-25/Playwright_POM_Practice_App/actions/workflows/playwright.yml)
+[![GitHub Actions](https://github.com/Nick-25/playwright-automation-framework/actions/workflows/playwright.yml/badge.svg)](https://github.com/Nick-25/playwright-automation-framework/actions/workflows/playwright.yml)
 [![Playwright](https://img.shields.io/badge/Playwright-1.59.1-2EAD33?logo=playwright)](https://playwright.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-20.19.0-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
@@ -26,6 +26,7 @@ For deeper documentation, see [`docs/application-overview.md`](docs/application-
 - Role-based authorization validation for user and admin flows
 - API automation for login, user management, tasks, pagination, and negative paths
 - Accessibility smoke testing with `@axe-core/playwright`
+- Visual regression smoke testing with Playwright screenshots
 - Cross-browser execution with Chromium and Firefox projects
 - Playwright `webServer` orchestration for reliable local test startup
 - SQLite-backed data persistence and seeded records
@@ -109,6 +110,7 @@ Detailed architecture notes are available in [`docs/architecture.md`](docs/archi
 | Language | TypeScript |
 | Runtime | Node.js |
 | Accessibility | `@axe-core/playwright` |
+| Visual testing | Playwright screenshot assertions |
 | Application server | Node.js HTTP server |
 | Data store | SQLite via `better-sqlite3` |
 | Browser coverage | Chromium and Firefox |
@@ -142,15 +144,23 @@ The framework uses multiple reporting outputs so results are useful to both engi
 
 ## Screenshots
 
-Screenshots are intentionally listed as placeholders until real project captures are added. Do not add generated or mock screenshots; use actual captures from local execution or GitHub Actions artifacts.
+Screenshots should be real project captures only. The login and dashboard images below were captured from the local application; CI and report screenshots remain listed as placeholders until they can be captured from actual GitHub Actions or Playwright report output.
 
 | Area | Placeholder path | Purpose |
 | --- | --- | --- |
-| Login page | `docs/images/login-page.png` | Show the authentication entry point and validation surface |
-| Dashboard | `docs/images/dashboard.png` | Show the authenticated workspace and metrics |
+| Login page | `docs/images/login-page.png` | Captured from the local application |
+| Dashboard | `docs/images/dashboard.png` | Captured from an authenticated local dashboard |
 | GitHub Actions run | `docs/images/github-actions-run.png` | Show CI execution and workflow status |
 | Playwright HTML report | `docs/images/playwright-html-report.png` | Show the local/debuggable Playwright report |
 | Test results | `docs/images/test-results.png` | Show summarized pass/fail and reporting output |
+
+### Login Page
+
+![Login page](docs/images/login-page.png)
+
+### Dashboard
+
+![Dashboard](docs/images/dashboard.png)
 
 ## Lessons Learned
 
@@ -162,6 +172,7 @@ Screenshots are intentionally listed as placeholders until real project captures
 ## Local Execution
 
 ```powershell
+nvm use
 npm install
 npx playwright install
 npm test
@@ -176,10 +187,13 @@ Useful Playwright commands:
 ```powershell
 npm run test:headed
 npm run test:a11y
+npm run test:visual
 npm run test:ui
 npm run test:debug
 npm run report
 ```
+
+Use Node.js `20.19.0` or newer. The repository includes `.nvmrc`, and `package.json` declares the same runtime expectation through `engines`.
 
 The accessibility smoke suite lives in `tests/accessibility.spec.ts` and can be run independently with:
 
@@ -189,6 +203,35 @@ npm run test:a11y
 
 It scans public entry points and an authenticated task workflow with WCAG 2.0/2.1 A and AA axe rules. The same spec is included in the full `npm test` run.
 
+The visual regression smoke suite lives in `tests/visual-regression.spec.ts` and can be run with:
+
+```powershell
+npm run test:visual
+```
+
+Update visual baselines intentionally with:
+
+```powershell
+npx playwright test tests/visual-regression.spec.ts --project=chromium --update-snapshots
+```
+
+## Docker Execution
+
+Docker support is included for consistent local and CI-style execution:
+
+```powershell
+docker build -t playwright-automation-framework .
+docker run --rm playwright-automation-framework
+```
+
+Or with Docker Compose:
+
+```powershell
+docker compose up --build
+```
+
+The compose file mounts `playwright-report/`, `test-results/`, and `ctrf/` so reports are available on the host after container execution.
+
 ## Local Data
 
 Users and tasks are stored in a local SQLite database at `data/app.db`. The database is created and seeded automatically when the server starts.
@@ -196,6 +239,8 @@ Users and tasks are stored in a local SQLite database at `data/app.db`. The data
 The database file is ignored by Git, so API-created users and tasks persist on your machine across server restarts but are not pushed to GitHub.
 
 To reset local data, stop the server and delete `data/app.db`. The next server start recreates the database with seeded users and tasks.
+
+API tests use shared cleanup helpers in `tests/helpers/api.ts` to remove durable users and tasks created during a run. This keeps local SQLite state from accumulating records across repeated executions.
 
 ## API and Postman Flow
 
@@ -284,10 +329,9 @@ For full protection, enable a GitHub branch protection rule or ruleset for `mast
 
 ## Future Enhancements
 
-- Add automated accessibility scans with axe and targeted keyboard-navigation coverage
-- Expand visual regression coverage for key workflow pages
+- Expand accessibility coverage beyond smoke checks with keyboard-navigation scenarios
+- Expand visual regression coverage beyond smoke baselines for key workflow states
 - Add mobile viewport projects for responsive validation
 - Introduce test data factories for larger API and UI scenarios
 - Add contract-style validation for API response schemas
 - Publish test trend data across CI runs
-- Add Docker support for consistent local and CI execution

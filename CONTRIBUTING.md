@@ -14,8 +14,8 @@ Prerequisites:
 Clone the repository and move into the project directory:
 
 ```powershell
-git clone https://github.com/Nick-25/Playwright_POM_Practice_App.git
-cd Playwright_POM_Practice_App
+git clone https://github.com/Nick-25/playwright-automation-framework.git
+cd playwright-automation-framework
 ```
 
 ## Installation
@@ -23,6 +23,7 @@ cd Playwright_POM_Practice_App
 Install Node dependencies:
 
 ```powershell
+nvm use
 npm install
 ```
 
@@ -46,8 +47,16 @@ Run useful local variants:
 
 ```powershell
 npm run test:headed
+npm run test:a11y
+npm run test:visual
 npm run test:ui
 npm run test:debug
+```
+
+The visual regression suite uses Chromium baselines. Update snapshots only when a visual change is intentional:
+
+```powershell
+npx playwright test tests/visual-regression.spec.ts --project=chromium --update-snapshots
 ```
 
 Playwright starts the local app through the `webServer` setting in `playwright.config.ts`. Start the app manually only when you want to inspect it in a browser:
@@ -73,6 +82,21 @@ Generated report locations:
 - `ctrf/ctrf-report.json` for standardized test reporting
 
 GitHub Actions also uploads these artifacts and publishes a CTRF summary when the workflow runs.
+
+## Docker
+
+Build and run the framework in Docker:
+
+```powershell
+docker build -t playwright-automation-framework .
+docker run --rm playwright-automation-framework
+```
+
+Or use Docker Compose:
+
+```powershell
+docker compose up --build
+```
 
 ## Pull Request Workflow
 
