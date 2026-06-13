@@ -235,7 +235,7 @@ It includes:
 - Page Object Model abstraction
 - CI reporting through Playwright HTML output and CTRF JSON
 
-At the time of writing, the suite contains 41 test cases per Playwright project. Because the config defines both Chromium and Firefox projects, a normal full run executes the suite twice for 82 total test executions.
+At the time of writing, the suite contains 48 declared test cases per Playwright project. Because the config defines both Chromium and Firefox projects, Playwright lists 96 project/test combinations for a full suite inventory.
 
 ## How the Tests Are Structured
 
