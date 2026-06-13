@@ -144,15 +144,15 @@ The framework uses multiple reporting outputs so results are useful to both engi
 
 ## Screenshots
 
-Screenshots should be real project captures only. The login and dashboard images below were captured from the local application; CI and report screenshots remain listed as placeholders until they can be captured from actual GitHub Actions or Playwright report output.
+Screenshots should be real project captures only. The images below are the current files in `docs/images`.
 
-| Area | Placeholder path | Purpose |
-| --- | --- | --- |
-| Login page | `docs/images/login-page.png` | Captured from the local application |
-| Dashboard | `docs/images/dashboard.png` | Captured from an authenticated local dashboard |
-| GitHub Actions run | `docs/images/github-actions-run.png` | Show CI execution and workflow status |
-| Playwright HTML report | `docs/images/playwright-html-report.png` | Show the local/debuggable Playwright report |
-| Test results | `docs/images/test-results.png` | Show summarized pass/fail and reporting output |
+| Area | Image |
+| --- | --- |
+| Login page | `docs/images/login-page.png` |
+| Dashboard | `docs/images/dashboard.png` |
+| GitHub Actions run | `docs/images/github-actions-run.png` |
+| Playwright HTML report | `docs/images/playwright-html-report.png` |
+| Accessibility test | `docs/images/accessibility-test.png` |
 
 ### Login Page
 
@@ -161,6 +161,18 @@ Screenshots should be real project captures only. The login and dashboard images
 ### Dashboard
 
 ![Dashboard](docs/images/dashboard.png)
+
+### GitHub Actions Run
+
+![GitHub Actions run](docs/images/github-actions-run.png)
+
+### Playwright HTML Report
+
+![Playwright HTML report](docs/images/playwright-html-report.png)
+
+### Accessibility Test
+
+![Accessibility test](docs/images/accessibility-test.png)
 
 ## Lessons Learned
 
@@ -335,3 +347,5 @@ For full protection, enable a GitHub branch protection rule or ruleset for `mast
 - Introduce test data factories for larger API and UI scenarios
 - Add contract-style validation for API response schemas
 - Publish test trend data across CI runs
+
+

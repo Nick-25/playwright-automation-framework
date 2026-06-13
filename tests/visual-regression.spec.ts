@@ -18,6 +18,8 @@ test.describe('visual regression smoke', () => {
     await signInWithStoredSession(page);
     await todoPage.goto();
     await todoPage.expectLoaded();
+    await todoPage.searchFor('Review pull request');
+    await expect(todoPage.summary).toHaveText(/1-1 of 1 task/);
 
     await expect(page).toHaveScreenshot('task-page.png', {
       fullPage: true,
@@ -25,4 +27,5 @@ test.describe('visual regression smoke', () => {
     });
   });
 });
+
 
