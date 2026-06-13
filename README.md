@@ -25,6 +25,7 @@ For deeper documentation, see [`docs/application-overview.md`](docs/application-
 - Authentication coverage across cookies, JWTs, and local browser state
 - Role-based authorization validation for user and admin flows
 - API automation for login, user management, tasks, pagination, and negative paths
+- Accessibility smoke testing with `@axe-core/playwright`
 - Cross-browser execution with Chromium and Firefox projects
 - Playwright `webServer` orchestration for reliable local test startup
 - SQLite-backed data persistence and seeded records
@@ -51,7 +52,7 @@ The project is representative of work commonly needed in QA automation consultin
 - **Playwright implementation:** Shows a practical framework baseline with page objects, shared fixtures, API helpers, test data patterns, and local app orchestration.
 - **CI/CD integration:** Includes a GitHub Actions workflow that installs dependencies, runs tests, uploads artifacts, and publishes machine-readable test results.
 - **API automation:** Covers authentication, authorization, user management, task workflows, pagination, validation, and negative-path scenarios through direct API requests.
-- **Accessibility testing:** Includes UI validation patterns such as inline errors and `aria-invalid` assertions, creating a foundation for deeper accessibility checks with tools such as axe or Playwright accessibility snapshots.
+- **Accessibility testing:** Includes UI validation patterns, `aria-invalid` assertions, and an axe-powered smoke suite for core public and authenticated pages.
 - **Framework modernization:** Provides a compact example of replacing brittle, UI-only regression coverage with a layered automation strategy spanning UI, API, reporting, and CI.
 
 ## Architecture Diagram
@@ -107,6 +108,7 @@ Detailed architecture notes are available in [`docs/architecture.md`](docs/archi
 | Test runner | Playwright Test |
 | Language | TypeScript |
 | Runtime | Node.js |
+| Accessibility | `@axe-core/playwright` |
 | Application server | Node.js HTTP server |
 | Data store | SQLite via `better-sqlite3` |
 | Browser coverage | Chromium and Firefox |
@@ -152,7 +154,7 @@ Screenshots are intentionally listed as placeholders until real project captures
 
 ## Lessons Learned
 
-- **Framework maintainability:** Page objects and fixtures keep selectors, setup, and repeated user actions out of specs, making the suite easier to extend as workflows change.
+- **Framework maintainability:** Page objects, fixtures, and focused smoke specs keep selectors, setup, and repeated user actions out of specs, making the suite easier to extend as workflows change.
 - **Flaky test reduction:** Playwright auto-waiting, API-driven setup, stable seeded users, and targeted cleanup reduce timing sensitivity and state leakage.
 - **Reporting strategy:** Pairing Playwright HTML reports with CTRF JSON and GitHub Actions summaries gives both engineers and stakeholders useful views of the same execution.
 - **Test organization:** Splitting UI workflows, API coverage, fixtures, helpers, and page objects keeps the framework readable while still demonstrating full-stack validation.
@@ -173,10 +175,19 @@ Useful Playwright commands:
 
 ```powershell
 npm run test:headed
+npm run test:a11y
 npm run test:ui
 npm run test:debug
 npm run report
 ```
+
+The accessibility smoke suite lives in `tests/accessibility.spec.ts` and can be run independently with:
+
+```powershell
+npm run test:a11y
+```
+
+It scans public entry points and an authenticated task workflow with WCAG 2.0/2.1 A and AA axe rules. The same spec is included in the full `npm test` run.
 
 ## Local Data
 

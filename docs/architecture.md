@@ -29,6 +29,7 @@ Test specifications live directly under `tests/`.
 
 - Browser tests validate end-to-end workflows through real pages.
 - API tests validate authentication, authorization, user management, task workflows, pagination, and negative paths.
+- Accessibility smoke tests use `@axe-core/playwright` to scan public and authenticated pages for WCAG A/AA violations.
 - Tests are organized around behavior areas rather than implementation files.
 - Cross-browser projects run the same suite in Chromium and Firefox.
 
