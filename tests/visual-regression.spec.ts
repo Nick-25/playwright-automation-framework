@@ -2,6 +2,7 @@ import { expect, test } from './fixtures/pages.js';
 import { signInWithStoredSession } from './helpers/auth.js';
 
 test.describe('visual regression smoke', () => {
+  test.skip(Boolean(process.env.CI), 'Run visual regression in a dedicated baseline environment.');
   test.skip(({ browserName }) => browserName !== 'chromium', 'Visual baselines are captured in Chromium.');
 
   test('captures the sign-in page baseline', async ({ page, signInPage }) => {
@@ -24,3 +25,4 @@ test.describe('visual regression smoke', () => {
     });
   });
 });
+
