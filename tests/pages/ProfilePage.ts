@@ -20,7 +20,7 @@ export class ProfilePage {
   }
 
   async goto() {
-    await this.page.goto('/profile');
+    await this.page.goto('/profile', { waitUntil: 'domcontentloaded' });
   }
 
   async loadProfile() {

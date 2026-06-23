@@ -36,7 +36,7 @@ export class TodoPage {
   }
 
   async goto() {
-    await this.page.goto('/todos');
+    await this.page.goto('/todos', { waitUntil: 'domcontentloaded' });
     await expect(this.summary).toContainText(/of \d+ tasks?/);
   }
 
