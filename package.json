@@ -21,13 +21,13 @@
     "node": ">=20.19.0"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.11.3",
+    "@axe-core/playwright": "^4.12.1",
     "@playwright/test": "^1.61.1",
-    "@types/node": "^25.9.2",
+    "@types/node": "^26.1.2",
     "playwright-ctrf-json-reporter": "^0.0.29",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
   },
   "dependencies": {
-    "better-sqlite3": "^12.11.1"
+    "better-sqlite3": "^13.0.1"
   }
 }
