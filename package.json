@@ -24,11 +24,11 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
     "@playwright/test": "^1.63.0",
-    "@types/node": "^25.9.2",
+    "@types/node": "^26.5.1",
     "playwright-ctrf-json-reporter": "^0.0.29",
     "typescript": "^7.0.2"
   },
   "dependencies": {
-    "better-sqlite3": "^13.0.1"
+    "better-sqlite3": "^13.0.3"
   }
 }
