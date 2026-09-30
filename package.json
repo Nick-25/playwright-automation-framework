@@ -12,7 +12,8 @@
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
     "test:debug": "playwright test --debug",
-    "report": "playwright show-report"
+    "report": "playwright show-report",
+    "test:list": "node scripts/generate-test-list.js"
   },
   "keywords": [],
   "author": "",
